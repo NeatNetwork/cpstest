@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="mcrpgApp">
+
+<!-- Mirrored from www.mcrpg.com/kohi-click-test by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 25 Mar 2020 15:44:24 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="/content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kohi Click Test</title>
+
+
+    <link href="/content/css3a9e.css?v=0wPJEEveUCwAnn8MLBJEYRMDYzRoAAiDkM985jbA4JU1" rel="stylesheet"/>
+
+
+    <!-- Custom Fonts -->
+    <link href="/content/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    
+  
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+        <div class="container topnav">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header"
+               
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    
+    
+
+
+<div class="container" style="margin-top: 50px; min-height:100%;" id="vue">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Kohi Click Test</h1>
+            <p class="lead">This is the click test that was featured on Kohi. Simply click the box below as fast as you can for 10 seconds, and you'll be given your average CPS.</p>
+            
+
+        </div>
+        <div class="col-md-4 text-right">
+            <img src="https://mcrpg.imgix.net/images/kohi-click-test.jpg?h=200" alt="Kohi Click Test" />
+        </div>
+    </div>
+
+    <h3 v-if="testDone">Results: <span id="cps">{{cps.toFixed(1)}}</span> CPS <span id="twtbox"></span></h3>
+    <h3 v-else>Clicks: {{clickCount}}</h3>
+
+
+    <button v-if="testDone" class="btn btn-default" @click="reset()">Restart Test</button>
+    <button v-else="testDone" class="btn btn-default" style="height: 200px; width: 100%" @click="buttonClick()">Click Here</button>
+    <h4 v-if="testRunning">{{timeElapsed.toFixed(2)}}</h4>
+    <div id="graph" v-if="testRunning || testDone"></div>
+
+    <br />
+    <br />
+    <hr />
+    <br />
+    <br />
+    <div class="clearfix"> </div>
+    </div>
+
+    <h2>What is CPS?</h2>
+    <p class="lead">CPS stands for Clicks Per Second. This is an indicator of how fast you can click and to achive this it says how many clicks you do in 10 secs then devides it by 10</p>
+</div>
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#vue",
+        data: {
+            clickCount: 0,
+            testDone: false,
+            testRunning: false,
+            timeElapsed: 0,
+            isBlockedRegion: false,
+            cps: 0,
+            lastClick: 0
+        },
+        created: function () {
+            var me = this;
+        },
+        methods: {
+            buttonClick: function () {
+                if (!this.testRunning) {
+                    this.start();
+                }
+                else {
+                    this.clickCount++;
+                    var time = new Date().getTime();
+                    var elapsed = time - this.lastClick;
+                    this.lastClick = time;
+
+                    Plotly.extendTraces("graph", {
+                        y: [[elapsed]]
+                    }, [0]);
+
+                }
+            },
+            start: function () {
+                var me = this;
+                me.started = new Date().getTime();
+                me.testRunning = true;
+                me.lastClick = new Date().getTime();
+
+                me.timerID = setInterval(function () {
+                    me.timeElapsed = (new Date().getTime() - me.started) / 1000.0;
+
+                    if (me.timeElapsed >= 2)
+                        me.stop();
+                }, 10);
+
+                Vue.nextTick(function () {
+                    Plotly.newPlot('graph', [{
+                        y: [],
+                        mode: 'lines',
+                        line: { color: '#80CAF6' }
+                    }]);
+                });
+                
+                
+            },
+
+            stop: function () {
+                this.testRunning = false;
+                this.testDone = true;
+                this.cps = this.clickCount / 2;
+                clearInterval(this.timerID);
+
+                setTimeout(function () {
+                    createButton();
+
+                }, 100);
+            },
+            reset: function () {
+                this.testRunning = false;
+                this.testDone = false;
+                this.clickCount = 0;
+                this.timeElapsed = 0;
+            }
+
+        }
+    });
+</script>
+
+
+    <!-- /.banner -->
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="list-inline">
+                    </ul>
+                    <p class="copyright text-muted small">&copy; Made by NeatPlaysAlt ;/</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/content/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module('mcrpgApp', []);
+    </script>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-70678120-3', 'auto');
+  ga('send', 'pageview');
+
+    </script>
+
+    
+    <script>window.twttr = function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } }(document, 'script', 'twitter-wjs');</script>
+
+    <script type="text/javascript">
+
+        function createButton() {
+
+            // Remove Whatever is in the tweeetbox div if theres somethign
+            //there to avoid adding multiple tweetbuttons
+
+            tweetdiv = document.getElementById('twtbox');
+            tweetdiv.innerHTML = "";
+
+            var elem = document.getElementById('twitterbutton');
+            if (elem != null) {
+                elem.parentNode.removeChild(elem);
+            }
+
+            // Create a New Tweet Element
+            var link = document.createElement('a');
+            link.setAttribute('href', 'https://twitter.com/share');
+            link.setAttribute('class', 'twitter-share-button');
+            link.setAttribute('style', 'margin-top:5px;');
+            link.setAttribute('id', 'twitterbutton');
+            link.setAttribute("data-text", "I just got " + document.getElementById("cps").innerText + " CPS on the Kohi Click Test");
+            link.setAttribute("data-via", "mcrpg_");
+            link.setAttribute("data-size", "large");
+
+            // Put it inside the twtbox div
+            tweetdiv.appendChild(link);
+
+            twttr.widgets.load(); //very important
+        }
+    </script>
+
+</body>
+
+<!-- Mirrored from www.mcrpg.com/kohi-click-test by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 25 Mar 2020 15:44:24 GMT -->
+</html>
+
